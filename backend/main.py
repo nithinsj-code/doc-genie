@@ -37,7 +37,7 @@ if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 
 EMBEDDING_MODEL = "models/gemini-embedding-2"
-CHAT_MODEL = "gemini-1.5-flash"
+CHAT_MODEL = "gemini-3.5-flash"
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
 SESSION_TTL_SECONDS = 60 * 60  # 1 hour
@@ -146,7 +146,7 @@ def generate(req: GenerateRequest):
     if not req.prompt.strip():
         raise HTTPException(status_code=400, detail="Prompt cannot be empty.")
 
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel(CHAT_MODEL)
     result = model.generate_content(req.prompt)
     return GenerateResponse(response=result.text)
 
