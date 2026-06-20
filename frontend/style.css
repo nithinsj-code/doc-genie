@@ -1,22 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  --bg: #10131a;
-  --bg-panel: #171b24;
-  --bg-card: #1d2230;
-  --bg-card-hover: #232938;
-  --border: #2a3040;
-  --border-strong: #3a4256;
-  --text: #ece9e2;
-  --text-muted: #98a0b3;
-  --text-faint: #5b6275;
-  --amber: #ffc857;
-  --amber-deep: #e0a83c;
-  --teal: #5ec8c2;
-  --teal-deep: #3da39d;
-  --error: #ff8585;
-  --radius: 14px;
-  --radius-sm: 9px;
+  --bg: #222222; /* Charcoal */
+  --bg-panel: #333333;
+  --bg-card: #444444;
+  --bg-card-hover: #555555;
+  --border: #555555;
+  --border-strong: #777777;
+  --text: #ffffff;
+  --text-muted: #cccccc;
+  --text-faint: #aaaaaa;
+  --amber: #ff7518; /* Pumpkin */
+  --amber-deep: #e65c00;
+  --teal: #ff7518; /* Same as pumpkin */
+  --teal-deep: #e65c00;
+  --error: #ff5555;
+  --radius: 4px;
+  --radius-sm: 2px;
 }
 
 * { box-sizing: border-box; }
@@ -26,9 +26,6 @@ html { scroll-behavior: smooth; }
 body {
   margin: 0;
   background: var(--bg);
-  background-image:
-    radial-gradient(circle at 12% 0%, rgba(94, 200, 194, 0.08), transparent 45%),
-    radial-gradient(circle at 88% 8%, rgba(255, 200, 87, 0.07), transparent 40%);
   color: var(--text);
   font-family: 'Inter', system-ui, sans-serif;
   line-height: 1.55;
@@ -121,8 +118,8 @@ header.site {
   background: var(--text-faint);
 }
 
-.status-dot.ok { background: var(--teal); box-shadow: 0 0 0 3px rgba(94,200,194,0.18); }
-.status-dot.err { background: var(--error); box-shadow: 0 0 0 3px rgba(255,133,133,0.18); }
+.status-dot.ok { background: var(--teal); }
+.status-dot.err { background: var(--error); }
 
 /* ---------- Panels grid ---------- */
 .panels {
@@ -160,8 +157,8 @@ header.site {
   justify-content: center;
 }
 
-.panel--gen .panel-icon { background: rgba(255,200,87,0.14); color: var(--amber); }
-.panel--pdf .panel-icon { background: rgba(94,200,194,0.14); color: var(--teal); }
+.panel--gen .panel-icon { background: var(--bg-card); color: var(--amber); }
+.panel--pdf .panel-icon { background: var(--bg-card); color: var(--teal); }
 
 .panel-head h2 {
   font-family: 'Fraunces', serif;
@@ -243,7 +240,7 @@ textarea::placeholder, input::placeholder { color: var(--text-faint); }
 
 .dropzone:hover, .dropzone.drag {
   border-color: var(--teal);
-  background: rgba(94,200,194,0.05);
+  background: var(--bg-card);
 }
 
 .dropzone svg { color: var(--text-faint); margin-bottom: 8px; }
