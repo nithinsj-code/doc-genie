@@ -21,7 +21,6 @@ from dotenv import load_dotenv
 from pypdf import PdfReader
 
 import google.generativeai as genai
-from openai import OpenAI
 
 load_dotenv()
 
@@ -29,7 +28,6 @@ load_dotenv()
 # Configuration
 # ---------------------------------------------------------------------------
 GEMINI_API_KEY = os.getenv("GEMINI_API")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Comma-separated list of allowed frontend origins, e.g.
 # "https://your-site.netlify.app,http://localhost:3000"
@@ -38,10 +36,8 @@ ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*")
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 
-openai_client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
-
-EMBEDDING_MODEL = "text-embedding-3-small"
-CHAT_MODEL = "gpt-4o-mini"
+EMBEDDING_MODEL = "models/text-embedding-004"
+CHAT_MODEL = "gemini-1.5-flash"
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
 SESSION_TTL_SECONDS = 60 * 60  # 1 hour
@@ -114,10 +110,14 @@ def chunk_text(text: str, chunk_size: int = CHUNK_SIZE, overlap: int = CHUNK_OVE
 
 
 def embed_texts(texts: List[str]) -> np.ndarray:
-    if not openai_client:
-        raise HTTPException(status_code=500, detail="OPENAI_API_KEY is not configured on the server.")
-    resp = openai_client.embeddings.create(model=EMBEDDING_MODEL, input=texts)
-    vectors = [d.embedding for d in resp.data]
+    if not GEMINI_API_KEY:
+        raise HTTPException(status_code=500, detail="GEMINI_API is not configured on the server.")
+    
+    resp = genai.embed_content(
+        model=EMBEDDING_MODEL,
+        content=texts
+    )
+    vectors = resp['embedding']
     return np.array(vectors, dtype="float32")
 
 
@@ -136,7 +136,6 @@ def health():
     return {
         "status": "ok",
         "gemini_configured": bool(GEMINI_API_KEY),
-        "openai_configured": bool(OPENAI_API_KEY),
     }
 
 
@@ -194,8 +193,8 @@ def ask_pdf(req: AskRequest):
         raise HTTPException(status_code=404, detail="Session not found or expired. Please re-upload the PDF.")
     if not req.question.strip():
         raise HTTPException(status_code=400, detail="Question cannot be empty.")
-    if not openai_client:
-        raise HTTPException(status_code=500, detail="OPENAI_API_KEY is not configured on the server.")
+    if not GEMINI_API_KEY:
+        raise HTTPException(status_code=500, detail="GEMINI_API is not configured on the server.")
 
     query_vector = embed_texts([req.question])
     k = min(4, len(session["chunks"]))
@@ -210,15 +209,14 @@ def ask_pdf(req: AskRequest):
     )
     user_prompt = f"Document excerpts:\n{context}\n\nQuestion: {req.question}"
 
-    completion = openai_client.chat.completions.create(
-        model=CHAT_MODEL,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ],
-        temperature=0.2,
+    full_prompt = f"{system_prompt}\n\n{user_prompt}"
+
+    model = genai.GenerativeModel(CHAT_MODEL)
+    result = model.generate_content(
+        full_prompt,
+        generation_config=genai.GenerationConfig(temperature=0.2)
     )
-    answer = completion.choices[0].message.content
+    answer = result.text
     return AskResponse(answer=answer)
 
 

@@ -22,9 +22,8 @@ Why restructure? Netlify only hosts **static** sites (HTML/CSS/JS) — it cannot
 run a long-lived Python/Streamlit process. Render hosts your **Python API**
 (FastAPI) as an always-on web service. The two talk to each other over HTTPS.
 
-You'll need two API keys before you start:
+You'll need an API key before you start:
 - **Gemini API key** → https://aistudio.google.com/app/apikey
-- **OpenAI API key** (used for embeddings + PDF Q&A) → https://platform.openai.com/api-keys
 
 ---
 
@@ -59,7 +58,6 @@ You'll need two API keys before you start:
    | **Instance Type** | Free (or paid for no cold-starts) |
 4. Under **Environment Variables**, add:
    - `GEMINI_API` = your Gemini key
-   - `OPENAI_API_KEY` = your OpenAI key
    - `ALLOWED_ORIGINS` = `*` for now (you'll tighten this in Step 4)
 5. Click **Create Web Service**. Wait for the build to finish.
 6. Copy your live URL, e.g. `https://docgenius-backend.onrender.com`.
@@ -127,7 +125,6 @@ your Netlify site can call it (instead of `*`, which allows any site).
 | Status strip shows "Backend URL not configured" | You forgot to edit `frontend/config.js` |
 | Status strip shows "Could not reach backend" | Render service is asleep (wait ~30s and refresh) or `ALLOWED_ORIGINS` doesn't include your Netlify URL |
 | `500: GEMINI_API is not configured` | Add `GEMINI_API` env var on Render and redeploy |
-| `500: OPENAI_API_KEY is not configured` | Add `OPENAI_API_KEY` env var on Render and redeploy |
 | PDF upload works but "Ask" returns 404 session not found | Sessions live in memory and reset if Render restarts/sleeps — re-upload the PDF |
 | CORS error in browser console | Double-check `ALLOWED_ORIGINS` on Render exactly matches your Netlify URL (no trailing slash) |
 
